@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications - Retro Newspaper App</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:700,400|Inter:400,700|IBM+Plex+Mono:400,700&display=swap">
+  <link rel="stylesheet" href="retro_newspaper_theme.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    .notif-title { font-family: var(--font-serif); font-size: 1.1rem; text-align: center; margin: 1.1em 0 0.5em 0; }
+    .notif-item { display: flex; align-items: center; gap: 0.8em; padding: 0.8em 0; border-bottom: 1px solid var(--border); }
+    .notif-icon { font-size: 1.2em; color: var(--primary); }
+    .notif-text { font-family: var(--font-mono); font-size: 1.02rem; flex: 1; }
+    .notif-time { font-size: 0.9rem; color: var(--border); }
+    .add-reminder-btn { width: 100%; margin-top: 1.2em; }
+  </style>
+</head>
+<body>
+  <main style="padding-bottom: 70px; max-width: 480px; margin: 0 auto;">
+    <header>
+      <div class="notif-title">🔔 Notifications & Reminders</div>
+    </header>
+    <section>
+      <div class="card" style="padding:0.7em 1em;">
+        <div class="notif-item">
+          <i data-lucide="clock" class="notif-icon"></i>
+          <span class="notif-text">Take medicine</span>
+          <span class="notif-time">8:00 AM</span>
+        </div>
+        <div class="notif-item">
+          <i data-lucide="edit-3" class="notif-icon"></i>
+          <span class="notif-text">Write journal</span>
+          <span class="notif-time">9:00 PM</span>
+        </div>
+      </div>
+      <button class="btn add-reminder-btn" aria-label="Add New Reminder"><i data-lucide="plus"></i> Add New Reminder</button>
+    </section>
+  </main>
+  <nav class="tabbar">
+    <button class="tabbar-btn" aria-label="Journal"><i data-lucide="book-open"></i></button>
+    <button class="tabbar-btn" aria-label="Todos"><i data-lucide="check-square"></i></button>
+    <button class="tabbar-btn active" aria-label="Notifications"><i data-lucide="bell"></i></button>
+    <button class="tabbar-btn" aria-label="Metrics"><i data-lucide="bar-chart-3"></i></button>
+    <button class="tabbar-btn" aria-label="Profile"><i data-lucide="user"></i></button>
+  </nav>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

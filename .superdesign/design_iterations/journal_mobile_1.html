@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Journal - Retro Newspaper App</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lora:700,400|Inter:400,700|IBM+Plex+Mono:400,700&display=swap">
+  <link rel="stylesheet" href="retro_newspaper_theme.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    .journal-date { font-family: var(--font-serif); font-size: 1.1rem; letter-spacing: 0.02em; }
+    .journal-entry-title { font-family: var(--font-serif); font-size: 1.1rem; font-weight: 700; }
+    .journal-entry-snippet { font-family: var(--font-mono); font-size: 0.98rem; color: var(--muted-foreground); }
+    .journal-entry-time { font-size: 0.85rem; color: var(--border); }
+    .fab-btn { position: fixed; right: 1.2em; bottom: 4.5em; background: var(--primary); color: var(--primary-foreground); border-radius: 50%; width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: var(--shadow-md); border: none; z-index: 101; }
+    .fab-btn:active { background: var(--accent); }
+  </style>
+</head>
+<body>
+  <main style="padding-bottom: 70px; max-width: 480px; margin: 0 auto;">
+    <header style="padding: 1.1em 0 0.5em 0; text-align: center;">
+      <div class="journal-date">📰 Journal — <span id="today-date">Today</span> <span style="font-size:1.1em;vertical-align:middle;">▼</span></div>
+    </header>
+    <section>
+      <div class="card">
+        <div class="journal-entry-title">Morning Reflections</div>
+        <div class="journal-entry-snippet">Woke up feeling grateful for the sunshine. Planning to focus on mindfulness today...</div>
+        <div class="journal-entry-time">08:15 AM</div>
+      </div>
+      <div class="card">
+        <div class="journal-entry-title">Lunch Break Thoughts</div>
+        <div class="journal-entry-snippet">Had a productive morning. Lunch was delicious, and I took a short walk outside.</div>
+        <div class="journal-entry-time">12:45 PM</div>
+      </div>
+      <div class="card">
+        <div class="journal-entry-title">Evening Wrap-up</div>
+        <div class="journal-entry-snippet">Reflected on the day’s progress. Ready to wind down and read a book.</div>
+        <div class="journal-entry-time">09:10 PM</div>
+      </div>
+    </section>
+    <button class="fab-btn" aria-label="Add New Journal Entry"><i data-lucide="plus"></i></button>
+  </main>
+  <nav class="tabbar">
+    <button class="tabbar-btn active" aria-label="Journal"><i data-lucide="book-open"></i></button>
+    <button class="tabbar-btn" aria-label="Todos"><i data-lucide="check-square"></i></button>
+    <button class="tabbar-btn" aria-label="Notifications"><i data-lucide="bell"></i></button>
+    <button class="tabbar-btn" aria-label="Metrics"><i data-lucide="bar-chart-3"></i></button>
+    <button class="tabbar-btn" aria-label="Profile"><i data-lucide="user"></i></button>
+  </nav>
+  <script>lucide.createIcons();</script>
+</body>
+</html>
