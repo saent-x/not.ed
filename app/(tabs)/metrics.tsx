@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default () => {
   return (
     <SafeAreaView>
-      <Text> I am Index </Text>
+      <Text> I am Metrics </Text>
     </SafeAreaView>
   );
 };
