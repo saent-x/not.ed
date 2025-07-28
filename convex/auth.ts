@@ -9,7 +9,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
     Microsoft({
       clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
       clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
-      tenantId: '9a0811ea-62e6-45ed-a377-6874f19cc0b4',
+      tenantId: process.env.tenantId,
       issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
     }),
     Google,
