@@ -1,0 +1,10 @@
+import { Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+export default function Journals() {
+  return (
+    <SafeAreaView>
+      <Text> I am Journals </Text>
+    </SafeAreaView>
+  );
+};
