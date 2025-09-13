@@ -31,7 +31,7 @@ export default function SignIn() {
 	} = useForm<UserLogin>({
 		defaultValues: {
 			email: "vangerwua@outlook.com",
-			password: "123JOHNp@ul",
+			password: "john9@UL",
 		},
 	});
 	const [signingIn, setSigningIn] = useState<boolean>(false);
@@ -46,6 +46,8 @@ export default function SignIn() {
 	const onSubmit: SubmitHandler<UserLogin> = async (data) => {
 		setSigningIn(true);
 		try {
+			console.log(data);
+
 			const result = await authClient.signIn.email({
 				email: data.email,
 				password: data.password,
@@ -53,6 +55,7 @@ export default function SignIn() {
 			console.log(`result -> ${result}`);
 
 			if (result.error) {
+				console.log(`error -> ${result.error}`);
 				throw result.error;
 			}
 
@@ -64,17 +67,18 @@ export default function SignIn() {
 					icon: <Ionicons name="checkmark-circle" size={24} color="black" />,
 				});
 
+				setSigningIn(false);
 				// router.replace("/(tabs)");
 			}
 		} catch (error) {
-			console.error("Sign-in error:", error);
+			console.log("Sign-in error:", error);
 			toast.error("Operation failed!", {
 				style: { backgroundColor: "white" },
 				description: `Sign in failed: ${error instanceof Error ? error.message : "Invalid credentials"}`,
 				duration: 6000,
 				icon: <Ionicons name="alert-circle" size={24} color="black" />,
 			});
-		} finally {
+
 			setSigningIn(false);
 		}
 	};

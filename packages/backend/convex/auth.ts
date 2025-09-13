@@ -21,7 +21,7 @@ export const { createUser, updateUser, deleteUser, createSession } =
         name: user.name,
       });
     },
-
+    
     // Delete the user when they are deleted from Better Auth
     onDeleteUser: async (ctx, userId) => {
       await ctx.db.delete(userId as Id<"users">);

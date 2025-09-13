@@ -8,33 +8,40 @@ import { expo } from "@better-auth/expo";
 
 const siteUrl = requireEnv("SITE_URL");
 
-export const createAuth = (ctx: GenericCtx) =>
-  // Configure your Better Auth instance here
-  betterAuth({
-    trustedOrigins: [
-      siteUrl,
-      requireEnv("EXPO_MOBILE_URL"),
-      "http://localhost:8081",
-    ],
-    database: convexAdapter(ctx, betterAuthComponent),
+export const createAuth =
+  (authType: "socials" | "emailAndPassword") => (ctx: GenericCtx) =>
+    // Configure your Better Auth instance here
+    betterAuth({
+      basePath:
+        authType === "emailAndPassword" ? "/api/auth/expo" : "/api/auth",
+      trustedOrigins: [
+        siteUrl,
+        requireEnv("EXPO_MOBILE_URL"),
+        "http://localhost:8081",
+      ],
+      database: convexAdapter(ctx, betterAuthComponent),
 
-    emailAndPassword: {
-      enabled: true,
-      requireEmailVerification: false,
-    },
-    socialProviders: {
-      github: {
-        clientId: process.env.GITHUB_CLIENT_ID!,
-        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      emailAndPassword: {
+        enabled: true,
+        requireEmailVerification: false,
       },
-      google: {
-        clientId: process.env.GOOGLE_CLIENT_ID!,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET
+      socialProviders: {
+        github: {
+          clientId: process.env.GITHUB_CLIENT_ID!,
+          clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        },
+        google: {
+          clientId: process.env.GOOGLE_CLIENT_ID!,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        },
+        microsoft: {
+          clientId: process.env.MICROSOFT_CLIENT_ID!,
+          clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+        },
       },
-      microsoft: {
-        clientId: process.env.MICROSOFT_CLIENT_ID!,
-        clientSecret: process.env.MICROSOFT_CLIENT_SECRET
-      }
-    },
-    plugins: [convex(), expo(), crossDomain({ siteUrl })],
-  });
+      plugins: [
+        expo(),
+        convex(),
+        ...(authType === "socials" ? [crossDomain({ siteUrl })] : []),
+      ],
+    });

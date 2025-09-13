@@ -41,7 +41,7 @@ export default function SignUpScreen() {
 				toast.error("Sign up failed");
 			}
 		} catch (e) {
-			console.error(e);
+			console.log(e);
 			toast.error("Error", {
 				description: e instanceof Error ? e.message : "Unknown error",
 			});
