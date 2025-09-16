@@ -14,7 +14,7 @@ interface SignUpForm {
 	name: string;
 }
 
-export default function SignUpScreen() {
+export default function SignUp() {
 	const {
 		control,
 		handleSubmit,
