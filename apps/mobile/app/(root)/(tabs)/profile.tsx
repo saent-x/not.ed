@@ -12,8 +12,6 @@ export default function Profile() {
 				onPress={async () => {
 					try {
 						await authClient.signOut();
-						// Use replace so user can't go back into protected tabs
-						router.replace("/(auth)");
 					} catch (e) {
 						console.warn("Sign out failed", e);
 					}

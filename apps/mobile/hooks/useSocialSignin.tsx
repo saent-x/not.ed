@@ -36,48 +36,65 @@ export function useSocialSignin(): UseSocialSigninResult {
       setSigningIn(true);
       setStatus("launching");
       try {
-        const { data, error } = await authClient.signIn.social({
-          provider,
-          disableRedirect: true,
-        });
-        if (error) throw error;
-        if (!data?.url) throw new Error("No social auth URL returned");
-
-        const redirectUri = AuthSession.makeRedirectUri({});
-        const authUrl = data.url.includes("redirect_uri=")
-          ? data.url
-          : `${data.url}${data.url.includes("?") ? "&" : "?"}redirect_uri=${encodeURIComponent(redirectUri)}`;
-
-        const result = await WebBrowser.openAuthSessionAsync(
-          authUrl,
-          AuthSession.makeRedirectUri({}),
+        await authClient.signIn.social(
+          {
+            provider,
+            callbackURL: "mobile://",
+          },
+          {
+            onError: (ctx) => {
+              console.log(`auth-error -> ${ctx.error.message}`);
+            },
+            onSuccess: (ctx) => {
+              console.log(`auth-success -> ${JSON.stringify(ctx.data)}`);
+            },
+          },
         );
 
-        if (result.type === "success") {
-          setStatus("success");
-          toast.success("Success!", {
-            id: "social-signin",
-            style: { backgroundColor: "white" },
-            description: "Logged in successfully.",
-            duration: 6000,
-            icon: <Ionicons name="checkmark-circle" size={24} color="black" />,
-          });
+        // if (error) throw error;
 
-          setSigningIn(false);
-          router.replace("/(tabs)");
-        } else if (result.type === "dismiss" || result.type === "cancel") {
-          setStatus("dismissed");
-          toast("Cancelled", {
-            description: "You closed the sign-in window.",
-          });
-        } else {
-          setStatus("error");
-          toast.error("Unexpected result", {
-            description: result.type,
-          });
+        // if (!data?.url) throw new Error("No social auth URL returned");
+        // const redirectUri = AuthSession.makeRedirectUri({});
+        // console.log(`r-uri: ${redirectUri}`);
+        // console.log(`data-url: ${data.url}`);
+        // console.log(`data-redirect: ${data.redirect}`);
 
-          setSigningIn(false);
-        }
+        // const authUrl = data.url.includes("redirect_uri=")
+        //   ? data.url
+        //   : `${data.url}${data.url.includes("?") ? "&" : "?"}redirect_uri=${encodeURIComponent(redirectUri)}`;
+
+        // console.log(`auth-uri: ${authUrl}`);
+
+        // const result = await WebBrowser.openAuthSessionAsync(
+        //   authUrl,
+        //   AuthSession.makeRedirectUri(),
+        // );
+
+        // if (result.type === "success") {
+        //   setStatus("success");
+        //   toast.success("Success!", {
+        //     id: "social-signin",
+        //     style: { backgroundColor: "white" },
+        //     description: "Logged in successfully.",
+        //     duration: 6000,
+        //     icon: <Ionicons name="checkmark-circle" size={24} color="black" />,
+        //   });
+
+        //   setSigningIn(false);
+        //   router.replace("/(tabs)");
+        // } else if (result.type === "dismiss" || result.type === "cancel") {
+        //   setStatus("dismissed");
+        //   setSigningIn(false);
+        //   toast("Cancelled", {
+        //     description: "You closed the sign-in window.",
+        //   });
+        // } else {
+        //   setStatus("error");
+        //   setSigningIn(false);
+        //   toast.error("Unexpected result", {
+        //     description: result.type,
+        //   });
+        // }
       } catch (err) {
         console.log("Social sign-in error:", err);
         setStatus("error");
