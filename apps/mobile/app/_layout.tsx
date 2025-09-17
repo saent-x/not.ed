@@ -4,6 +4,7 @@ import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import { authClient } from "@/lib/auth-client";
 import { Toaster } from "sonner-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { HeroUINativeProvider } from "heroui-native";
 import "../global.css";
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
@@ -19,8 +20,10 @@ export default function Layout() {
   return (
     <ConvexBetterAuthProvider client={convex} authClient={authClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <Slot />
-        <Toaster />
+        <HeroUINativeProvider>
+          <Slot />
+          <Toaster />
+        </HeroUINativeProvider>
       </GestureHandlerRootView>
     </ConvexBetterAuthProvider>
   );
