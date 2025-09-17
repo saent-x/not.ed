@@ -9,28 +9,46 @@ interface TabItem {
 }
 
 const tabConfig: TabItem[] = [
-  { name: "index", label: "Home", sf: "house.fill", android: "ic_home" },
   {
-    name: "activity",
-    label: "Activity",
-    sf: "checkmark.square",
+    name: "index",
+    label: "Home",
+    sf: "house",
     android: "ic_activity",
   },
-  { name: "journals", label: "Journals", sf: "book", android: "ic_journals" },
-  { name: "metrics", label: "Metrics", sf: "chart.bar", android: "ic_metrics" },
-  { name: "profile", label: "Profile", sf: "person", android: "ic_profile" },
+  {
+    name: "tasks-tab",
+    label: "Tasks",
+    sf: "checklist",
+    android: "ic_activity",
+  },
+  { name: "reminders", label: "Reminders", sf: "bell", android: "ic_metrics" },
+  {
+    name: "journals",
+    label: "Journals",
+    sf: "book.closed",
+    android: "ic_journals",
+  },
+  { name: "groups", label: "Groups", sf: "person.3", android: "ic_profile" },
 ];
-
 
 const asSymbol = (value: string) =>
   value as unknown as /* Icon expects union */ never;
 
 export default function TabLayout() {
   return (
-    <NativeTabs iconColor="#cc9469" labelStyle={{ color: "#cc9469" }}>
+    <NativeTabs
+      iconColor="#966E4F"
+      labelVisibilityMode="unlabeled"
+    >
       {tabConfig.map((t) => (
-        <NativeTabs.Trigger key={t.name} name={t.name}>
-          <Label>{t.label}</Label>
+        <NativeTabs.Trigger
+          
+          options={{
+          }}
+          key={t.name}
+          name={t.name}
+        >
+          <Label>{""}</Label>
           <Icon sf={asSymbol(t.sf)} drawable={t.android} />
         </NativeTabs.Trigger>
       ))}

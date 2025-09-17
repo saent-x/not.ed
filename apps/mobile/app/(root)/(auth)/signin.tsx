@@ -93,16 +93,16 @@ export default function SignIn() {
       >
         <ScrollView className="h-full">
           <View>
-            <View className="mt-10 items-center">
+            <View className="mt-10 pb-5">
               <Image
                 source={require("../../../assets/logo-color.png")}
-                style={{ height: 100, width: 100 }}
+                style={{ height: 80, width: 80 }}
               />
             </View>
-            <Text className="mx-4 my-5 text-center text-3xl font-bold text-primary">
+            <Text className="mx-4 my-2 text-left text-5xl font-extrabold text-primary">
               {"Welcome back"}
             </Text>
-            <Text className="text-md mx-4 mb-8 text-center text-secondary">
+            <Text className="text-md mx-4 mb-10 text-left text-lg text-secondary">
               {"Sign in to continue to your account"}
             </Text>
             <View className="mx-4 my-2">
