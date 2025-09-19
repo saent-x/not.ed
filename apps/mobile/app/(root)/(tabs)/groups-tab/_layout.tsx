@@ -1,8 +1,5 @@
-import {
-  createMaterialTopTabNavigator,
-} from "@react-navigation/material-top-tabs";
-import Index from.ndex";
-
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import Index from "./index";
 
 const MaterialTopTabs = createMaterialTopTabNavigator();
 
@@ -11,11 +8,11 @@ const Layout = () => {
     <MaterialTopTabs.Navigator
       screenOptions={{
         tabBarIndicatorStyle: {
-          backgroundColor: '#966E4F'
+          backgroundColor: "#966E4F",
         },
         tabBarStyle: {
           backgroundColor: "#f2ede8",
-          borderColor: "red"
+          borderColor: "red",
         },
       }}
       style={{ paddingTop: 95, backgroundColor: "#fcfaf7", borderWidth: 0 }}
