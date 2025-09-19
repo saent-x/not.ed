@@ -16,7 +16,7 @@ const tabConfig: TabItem[] = [
     android: "ic_activity",
   },
   {
-    name: "tasks-tab",
+    name: "tasks",
     label: "Tasks",
     sf: "checklist",
     android: "ic_activity",

@@ -1,10 +1,8 @@
 import {
   createMaterialTopTabNavigator,
 } from "@react-navigation/material-top-tabs";
-import Day from "./day";
-import Week from "./week";
-import Month from "./month";
-import Year from "./year";
+import Index from.ndex";
+
 
 const MaterialTopTabs = createMaterialTopTabNavigator();
 
@@ -22,10 +20,7 @@ const Layout = () => {
       }}
       style={{ paddingTop: 95, backgroundColor: "#fcfaf7", borderWidth: 0 }}
     >
-      <MaterialTopTabs.Screen name="DAY" component={Day} />
-      <MaterialTopTabs.Screen name="WEEK" component={Week} />
-      <MaterialTopTabs.Screen name="MONTH" component={Month} />
-      <MaterialTopTabs.Screen name="YEAR" component={Year} />
+      <MaterialTopTabs.Screen name="DAY" component={Index} />
     </MaterialTopTabs.Navigator>
   );
 };
