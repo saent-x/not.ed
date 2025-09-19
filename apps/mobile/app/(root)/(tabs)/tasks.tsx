@@ -1,8 +1,22 @@
-import { ScrollView, Text, View } from "react-native";
 import { TaskItems } from "@/components/tasks/TaskItems";
 import { TaskItem } from "@/lib/models";
+import { useState } from "react";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { Calendar, LocaleConfig } from "react-native-calendars";
 
-export default function Week() {
+export default function Day() {
+  const [selected, setSelected] = useState("");
+  
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    // Simulate an API call or async operation
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  };
+
   const todayTasks: TaskItem[] = [
     {
       id: 1,
@@ -39,8 +53,24 @@ export default function Week() {
     },
   ];
   return (
-    <ScrollView className="p-5 bg-background h-full">
+    <ScrollView refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+    } className="p-5 bg-background h-full">
       <View className="flex flex-col gap-12">
+        <View>
+          <Calendar
+            onDayPress={(day) => {
+              setSelected(day.dateString);
+            }}
+            markedDates={{
+              [selected]: {
+                selected: true,
+                disableTouchEvent: true,
+                // selectedDotColor: "orange",
+              },
+            }}
+          />
+        </View>
         <View>
           <Text className="text-xl font-bold">{"Today"}</Text>
           <TaskItems tasks={todayTasks} />

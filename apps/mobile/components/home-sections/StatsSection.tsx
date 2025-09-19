@@ -4,7 +4,7 @@ import { Text, View } from "react-native";
 export const StatsSection = () => {
   return (
     <View>
-      <View className="pt-8">
+      <View className="pt-2">
         <Text className="text-xl font-bold">{"Your Stats"}</Text>
         <View className="pt-5 flex flex-row justify-between">
           <Surface className="bg-[#f2ede8] w-[49%]" variant="none">

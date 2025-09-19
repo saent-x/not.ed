@@ -1,9 +1,6 @@
 import { RefreshControl, ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Avatar } from "heroui-native";
 import { useQuery } from "convex/react";
 import { api } from "@not.ed/backend/convex/_generated/api";
-import { getInitials } from "@/lib/util";
 import { useState } from "react";
 import { StatsSection } from "@/components/home-sections/StatsSection";
 import { ReminderSection } from "@/components/home-sections/ReminderSection";
@@ -59,7 +56,7 @@ export default function Todos() {
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
-      className="p-5 h-full"
+      className="p-5 h-full bg-background"
     >
       {user && (
         <View className="flex flex-row justify-end">

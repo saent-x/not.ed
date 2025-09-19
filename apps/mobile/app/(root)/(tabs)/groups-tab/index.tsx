@@ -1,8 +1,12 @@
 import { TaskItems } from "@/components/tasks/TaskItems";
 import { TaskItem } from "@/lib/models";
+import { useState } from "react";
 import { ScrollView, Text, View } from "react-native";
+import { Calendar, LocaleConfig } from "react-native-calendars";
 
 export default function Day() {
+  const [selected, setSelected] = useState("");
+
   const todayTasks: TaskItem[] = [
     {
       id: 1,
@@ -41,6 +45,20 @@ export default function Day() {
   return (
     <ScrollView className="p-5 bg-background h-full">
       <View className="flex flex-col gap-12">
+        <View>
+          <Calendar
+            onDayPress={(day) => {
+              setSelected(day.dateString);
+            }}
+            markedDates={{
+              [selected]: {
+                selected: true,
+                disableTouchEvent: true,
+                // selectedDotColor: "orange",
+              },
+            }}
+          />{" "}
+        </View>
         <View>
           <Text className="text-xl font-bold">{"Today"}</Text>
           <TaskItems tasks={todayTasks} />
