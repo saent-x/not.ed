@@ -10,6 +10,9 @@
 
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as shared from "../shared.js";
+import type * as stats from "../stats.js";
+import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
 
 import type {
@@ -29,6 +32,9 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
+  shared: typeof shared;
+  stats: typeof stats;
+  tasks: typeof tasks;
   users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;

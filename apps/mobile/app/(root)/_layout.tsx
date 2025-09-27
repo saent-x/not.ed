@@ -1,14 +1,10 @@
-import { Stack } from "expo-router";
-import { Image, useColorScheme, View } from "react-native";
+import { router, Stack } from "expo-router";
+import { Image, Pressable, View } from "react-native";
 import { useConvexAuth } from "convex/react";
 import LoadingScreen from "@/components/LoadingScreen";
-import { useQuery } from "convex/react";
-import { Avatar, Surface } from "heroui-native";
-import { getInitials } from "@/lib/util";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function RootLayout() {
-  const theme = useColorScheme();
   const { isAuthenticated, isLoading } = useConvexAuth();
 
   if (isLoading) {
@@ -33,16 +29,30 @@ export default function RootLayout() {
             headerBackVisible: true,
             headerTransparent: true,
             headerLeft: () => (
-              <Image
-                className="h-10 w-10"
-                source={require("../../assets/dog.png")}
-              />
+              <Pressable onPress={() => router.push("/profile")}>
+                <Image
+                  className="h-10 w-10"
+                  source={require("../../assets/dog.png")}
+                />
+              </Pressable>
             ),
-            headerRight: () => (
-              <View className="h-10 w-10 flex flex-row items-center justify-center">
-                <Ionicons name="settings-outline" size={24} color="black" />
-              </View>
-            ),
+            // headerRight: () => (
+            //   <Pressable onPress={() => router.push("/settings")}>
+            //     <View className="h-10 w-10 flex flex-row items-center justify-center">
+            //       <Ionicons name="settings-outline" size={24} color="black" />
+            //     </View>
+            //   </Pressable>
+            // ),
+          }}
+        />
+      </Stack.Protected>
+      <Stack.Protected guard={isAuthenticated}>
+        <Stack.Screen
+          name="(misc)"
+          options={{
+            headerShown: true,
+            headerTitle: "",
+            headerTransparent: true,
           }}
         />
       </Stack.Protected>
