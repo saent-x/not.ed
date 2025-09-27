@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=WDXL+Lubrifont+JP+N&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,6 +8,7 @@
   :root {
     --color-primary: #cc9469;
     --color-secondary: #f2edeb;
+    --color-tertiary: #8a705c;
     --color-background: #fcfaf7;
     --color-text-primary: #17140f;
     --color-text-secondary: #8a705c;
@@ -14,8 +17,13 @@
   .dark {
     --color-primary: 147 197 253;
     --color-secondary: #f2edeb;
+    --color-tertiary: #8a705c;
     --color-background: #211712;
     --color-text-primary: 243 244 246;
     --color-text-secondary: 156 163 175;
   }
+}
+
+body {
+  font-family: 'EB Garamond', serif;
 }

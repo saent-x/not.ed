@@ -5,70 +5,81 @@ import { useState } from "react";
 import { StatsSection } from "@/components/home-sections/StatsSection";
 import { ReminderSection } from "@/components/home-sections/ReminderSection";
 import { JournalSection } from "@/components/home-sections/JournalSection";
-import { JournalEntry, Reminder } from "@/lib/models";
+import { Spacer } from "@/components/Spacer";
+import { ExpandableFAB } from "@/components/ui/ExpandableFAB";
 
 export default function Todos() {
-  const user = useQuery(api.users.getCurrentUser);
+	const user = useQuery(api.users.getCurrentUser);
 
-  const [refreshing, setRefreshing] = useState(false);
+	const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    // Simulate an API call or async operation
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
-  };
+	const onRefresh = () => {
+		setRefreshing(true);
+		// Simulate an API call or async operation
+		setTimeout(() => {
+			setRefreshing(false);
+		}, 2000);
+	};
 
-  const reminders: Reminder[] = [
-    {
-      id: 1,
-      icon: "cart-outline",
-      title: "Grocery Shopping",
-      date: "Tomorrow, 9:00AM",
-    },
-    {
-      id: 2,
-      icon: "medkit-outline",
-      title: "Doctor's Appointment",
-      date: "Tomorrow, 12:00PM",
-    },
-  ];
+	const getData = useQuery(api.shared.getFeaturedRemindersAndJournalEntry);
 
-  const journalEntries: JournalEntry[] = [
-    {
-      id: 1,
-      icon: "cart-outline",
-      title: "Examination of Conscience for the Day",
-      date: "September 12, 2025",
-    },
-    {
-      id: 2,
-      icon: "medkit-outline",
-      title: "Reflections on the Week",
-      date: "September 20, 2025",
-    },
-  ];
+	return (
+		<View style={{ flex: 1 }}>
+			{/*---------------------- Header Section ------------------------*/}
+			<ScrollView
+				refreshControl={
+					<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+				}
+				showsVerticalScrollIndicator={false}
+				className="p-5 h-full bg-background"
+			>
+				{user && getData && (
+					<View className="flex flex-row justify-end">
+						<Text className="text-3xl font-extrabold">{`Hello, ${user?.name} 👋🏽`}</Text>
+					</View>
+				)}
+				<StatsSection />
+				<ReminderSection reminders={getData?.reminders ?? []} />
+				<JournalSection journalEntries={getData?.journalEntries ?? []} />
 
-  return (
-    /*---------------------- Header Section ------------------------*/
-    <ScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-      className="p-5 h-full bg-background"
-    >
-      {user && (
-        <View className="flex flex-row justify-end">
-          <Text className="text-3xl font-extrabold">{`Hello, ${user?.name} 👋🏽`}</Text>
-        </View>
-      )}
-      <StatsSection />
-      <ReminderSection reminders={reminders} />
-      <JournalSection journalEntries={journalEntries} />
+				{/*---------------------- Some Space ------------------------*/}
+				<Spacer />
+			</ScrollView>
 
-      {/*---------------------- Some Space ------------------------*/}
-      <View className="mt-10" />
-    </ScrollView>
-  );
+			<ExpandableFAB
+				items={[
+					{
+						icon: "checkmark-circle-outline",
+						label: "Add Task",
+						onPress: () => console.log("Add task pressed"),
+						showPlus: true,
+					},
+					{
+						icon: "alarm-outline",
+						label: "Add Reminder",
+						onPress: () => console.log("Add reminder pressed"),
+						showPlus: true,
+					},
+					{
+						icon: "book-outline",
+						label: "Add Journal",
+						onPress: () => console.log("Add journal pressed"),
+						showPlus: true,
+					},
+					{
+						icon: "people-outline",
+						label: "Add Group",
+						onPress: () => console.log("Add group pressed"),
+						showPlus: true,
+					},
+					{
+						icon: "mic-outline",
+						label: "AI Voice Chat",
+						onPress: () => console.log("AI voice chat pressed"),
+						showPlus: false,
+					},
+				]}
+			/>
+		</View>
+	);
 }

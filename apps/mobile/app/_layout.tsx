@@ -9,22 +9,23 @@ import "../global.css";
 
 const convexUrl = process.env.EXPO_PUBLIC_CONVEX_URL;
 if (!convexUrl) {
-  throw new Error("Missing EXPO_PUBLIC_CONVEX_URL environment variable");
+	throw new Error("Missing EXPO_PUBLIC_CONVEX_URL environment variable");
 }
+
 const convex = new ConvexReactClient(convexUrl, {
-  unsavedChangesWarning: false,
-  // verbose: true
+	unsavedChangesWarning: false,
+	// verbose: true
 });
 
 export default function Layout() {
-  return (
-    <ConvexBetterAuthProvider client={convex} authClient={authClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <HeroUINativeProvider>
-          <Slot />
-          <Toaster />
-        </HeroUINativeProvider>
-      </GestureHandlerRootView>
-    </ConvexBetterAuthProvider>
-  );
+	return (
+		<ConvexBetterAuthProvider client={convex} authClient={authClient}>
+			<GestureHandlerRootView style={{ flex: 1 }}>
+				<HeroUINativeProvider>
+					<Slot />
+					<Toaster />
+				</HeroUINativeProvider>
+			</GestureHandlerRootView>
+		</ConvexBetterAuthProvider>
+	);
 }

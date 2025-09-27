@@ -14,6 +14,8 @@
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.8.0",
-    "convex": "^1.27.0"
+    "convex": "^1.27.0",
+    "convex-helpers": "^0.1.104",
+    "date-fns": "^4.1.0"
   }
 }

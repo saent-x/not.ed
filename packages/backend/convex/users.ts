@@ -19,3 +19,10 @@ export const getCurrentUser = query({
     };
   },
 });
+
+export const getUserStats = query({
+  args: {},
+  handler: async (ctx) => {
+    
+  },
+});
