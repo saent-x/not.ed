@@ -5,6 +5,7 @@ import { filter } from "convex-helpers/server/filter";
 import type { TaskItem } from "@not.ed/shared";
 import { authComponent } from "./auth";
 import type { Id } from "./_generated/dataModel";
+import { AuthGuard } from "./util";
 
 export const createTask = mutation({
 	args: {
@@ -53,17 +54,13 @@ export const getTasksByDate = query({
 		day: v.number(),
 	},
 	handler: async (ctx, args) => {
-		const currentUser = await authComponent.getAuthUser(ctx);
-
-		if (!currentUser) {
-			return [];
-		}
+		const currentUser = await AuthGuard(ctx);
 
 		const tasks = await filter(
 			ctx.db
 				.query("tasks")
 				.withIndex("userId", (q) =>
-					q.eq("userId", currentUser.userId as Id<"users">),
+					q.eq("userId", currentUser?.userId as Id<"users">),
 				),
 			(task) =>
 				isSameDay(new Date(task.expireAt || Date.now()), new Date(args.day)),
@@ -79,11 +76,7 @@ export const toggleTaskCompletion = mutation({
 		completed: v.boolean(),
 	},
 	handler: async (ctx, args) => {
-		const currentUser = await authComponent.getAuthUser(ctx);
-		if (!currentUser) {
-			return;
-		}
-
+		await AuthGuard(ctx);
 		await ctx.db.patch(args.taskId, { completed: args.completed });
 	},
 });
@@ -93,11 +86,7 @@ export const getTaskById = query({
 		taskId: v.id("tasks"),
 	},
 	handler: async (ctx, args) => {
-		const currentUser = await authComponent.getAuthUser(ctx);
-
-		if (!currentUser) {
-			return null;
-		}
+		await AuthGuard(ctx);
 
 		const task = await ctx.db.get(args.taskId);
 		if (!task) {
@@ -110,5 +99,63 @@ export const getTaskById = query({
 			.collect();
 
 		return { ...task, childTasks };
+	},
+});
+
+export const updateTask = mutation({
+	args: {
+		taskId: v.id("tasks"),
+		description: v.string(),
+		expireAt: v.number(),
+		priority: v.string(),
+		childTasks: v.optional(
+			v.array(
+				v.object({
+					_id: v.id("childTasks"),
+					title: v.string(),
+					completed: v.boolean(),
+				}),
+			),
+		),
+	},
+	handler: async (ctx, args) => {
+		await AuthGuard(ctx);
+
+		await ctx.db.patch(args.taskId, {
+			description: args.description,
+			expireAt: args.expireAt,
+			priority: args.priority,
+		});
+
+		// update child tasks
+		args.childTasks?.forEach(async (childTask) => {
+			await ctx.db.patch(childTask._id as Id<"childTasks">, {
+				title: childTask.title,
+				completed: childTask.completed,
+			});
+		});
+
+		return;
+	},
+});
+
+export const deleteTask = mutation({
+	args: {
+		taskId: v.id("tasks"),
+	},
+	handler: async (ctx, args) => {
+		await AuthGuard(ctx);
+
+		// delete associated child tasks
+		const childTasks = await ctx.db
+			.query("childTasks")
+			.withIndex("parentTaskId", (q) => q.eq("parentTaskId", args.taskId))
+			.collect();
+
+		for (const childTask of childTasks) {
+			await ctx.db.delete(childTask._id as Id<"childTasks">);
+		}
+
+		await ctx.db.delete(args.taskId);
 	},
 });

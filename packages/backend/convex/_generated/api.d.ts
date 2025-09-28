@@ -14,6 +14,7 @@ import type * as shared from "../shared.js";
 import type * as stats from "../stats.js";
 import type * as tasks from "../tasks.js";
 import type * as users from "../users.js";
+import type * as util from "../util.js";
 
 import type {
   ApiFromModules,
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   stats: typeof stats;
   tasks: typeof tasks;
   users: typeof users;
+  util: typeof util;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 
