@@ -26,3 +26,8 @@ export function capitalize(word: string): string {
 	if (!word) return "";
 	return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
 }
+
+export const mapToKey = <T>(arr: T[]): (T & { key: number })[] => {
+	let counter = 0;
+	return arr.map((item) => ({ ...item, key: counter++ }));
+};

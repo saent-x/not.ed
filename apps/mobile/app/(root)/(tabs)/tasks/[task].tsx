@@ -19,6 +19,7 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@not.ed/backend/convex/_generated/api";
 import { toast } from "sonner-native";
 import type { Id } from "@not.ed/backend/convex/_generated/dataModel";
+import { mapToKey } from "@/lib/util";
 
 export default function Edit() {
 	const taskId = useLocalSearchParams().task as string;
@@ -27,14 +28,18 @@ export default function Edit() {
 	});
 
 	const [description, setDescription] = useState("");
-	const [childTasks, setChildTasks] = useState<ChildTask[]>([]);
+	type ChildTaskWithKey = ChildTask & { key?: number };
+	const [childTasks, setChildTasks] = useState<ChildTaskWithKey[]>([]);
 	const [expireAt, setExpireAt] = useState<Date>(new Date());
 	const [taskPriority, setTaskPriority] = useState<TaskPriority>("low");
 
 	useEffect(() => {
 		if (task) {
 			setDescription(task.description);
-			setChildTasks(task.childTasks ?? []);
+
+			const _childTasks = mapToKey<ChildTask>(task.childTasks ?? []); // this adds a unique key to each child task
+			setChildTasks(_childTasks as ChildTaskWithKey[]);
+
 			setExpireAt(new Date(task.expireAt ?? Date.now()));
 			setTaskPriority((task.priority as TaskPriority) ?? "low");
 		}
@@ -46,9 +51,9 @@ export default function Edit() {
 		setChildTasks((prev) => [
 			...prev,
 			{
-				// TODO: implement unique key system
 				title: "",
 				completed: false,
+				key: (prev[prev.length - 1]?.key ?? 0) + 1,
 			},
 		]);
 	};
@@ -151,7 +156,7 @@ export default function Edit() {
 								<View className="flex flex-col gap-3">
 									{childTasks?.map((value, index) => (
 										<View
-											key={value?._id}
+											key={value?.key}
 											className="flex-row gap-3 p-2 rounded-md bg-white items-center"
 										>
 											<Checkbox

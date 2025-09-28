@@ -129,6 +129,7 @@ export const updateTask = mutation({
 
 		// update child tasks
 		args.childTasks?.forEach(async (childTask) => {
+			// if the child task has an _id, update it; otherwise, add new childTask
 			await ctx.db.patch(childTask._id as Id<"childTasks">, {
 				title: childTask.title,
 				completed: childTask.completed,
