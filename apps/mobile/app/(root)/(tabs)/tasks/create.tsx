@@ -32,7 +32,6 @@ export default function Create() {
 		setChildTasks((prev) => [
 			...prev,
 			{
-				_id: Date.now() + prev.length,
 				title: "",
 				completed: false,
 			},

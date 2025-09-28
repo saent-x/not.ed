@@ -1,5 +1,5 @@
-import { TaskPriority } from "@/lib/models";
-import { FC } from "react";
+import type { TaskPriority } from "@/lib/models";
+import type { FC } from "react";
 import { TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 

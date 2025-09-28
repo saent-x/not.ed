@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { Button, Checkbox, Chip } from "heroui-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,20 +18,27 @@ import type { ChildTask, TaskPriority } from "@not.ed/shared";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@not.ed/backend/convex/_generated/api";
 import { toast } from "sonner-native";
-import { Id } from "@not.ed/backend/convex/_generated/dataModel";
+import type { Id } from "@not.ed/backend/convex/_generated/dataModel";
 
 export default function Edit() {
-	const [description, setDescription] = useState("");
-	const [childTasks, setChildTasks] = useState<ChildTask[]>([]);
-	const [expireAt, setExpireAt] = useState<Date>(new Date());
-	const [taskPriority, setTaskPriority] = useState<TaskPriority>("low");
-
 	const taskId = useLocalSearchParams().task as string;
 	const task = useQuery(api.tasks.getTaskById, {
 		taskId: taskId as Id<"tasks">,
 	});
 
-	console.log("Editing task with ID:", taskId);
+	const [description, setDescription] = useState("");
+	const [childTasks, setChildTasks] = useState<ChildTask[]>([]);
+	const [expireAt, setExpireAt] = useState<Date>(new Date());
+	const [taskPriority, setTaskPriority] = useState<TaskPriority>("low");
+
+	useEffect(() => {
+		if (task) {
+			setDescription(task.description);
+			setChildTasks(task.childTasks ?? []);
+			setExpireAt(new Date(task.expireAt ?? Date.now()));
+			setTaskPriority((task.priority as TaskPriority) ?? "low");
+		}
+	}, [task]);
 
 	const addChildTask = () => {
 		console.log("addding...");
@@ -39,20 +46,40 @@ export default function Edit() {
 		setChildTasks((prev) => [
 			...prev,
 			{
-				_id: Date.now() + prev.length,
+				// TODO: implement unique key system
 				title: "",
 				completed: false,
 			},
 		]);
 	};
-	const updateChildTask = (index: number, title: string) =>
+	const updateChildTask = (
+		index: number,
+		obj: { title?: string; completed?: boolean },
+	) =>
 		setChildTasks((prev) =>
-			prev.map((task, i) => (i === index ? { ...task, title } : task)),
+			prev.map((task, i) =>
+				i === index
+					? {
+							...task,
+							...obj,
+						}
+					: task,
+			),
 		);
 	const removeChildTask = (index: number) =>
 		setChildTasks((prev) => prev.filter((_, i) => i !== index));
 
-	const handleEdit = async () => {};
+	const handleEdit = async () => {
+		const updatedTask = {
+			taskId: taskId as Id<"tasks">,
+			description,
+			expireAt,
+			childTasks,
+			priority: taskPriority,
+		};
+
+		console.log("Updating task:", JSON.stringify(updatedTask, null, "\t"));
+	};
 
 	const handleCancel = () => {
 		router.back();
@@ -84,7 +111,7 @@ export default function Edit() {
 										className="rounded-sm py-3  placeholder:text-gray-600 text-3xl h-auto"
 										placeholder="Task Description"
 										placeholderTextColor="#9CA3AF"
-										value={task?.description}
+										value={description}
 										onChangeText={setDescription}
 										multiline
 										textAlignVertical="top"
@@ -94,7 +121,7 @@ export default function Edit() {
 									<Text className="text-gray-900 text-md">Expire&apos;s</Text>
 									<DateTimePicker
 										mode="datetime"
-										value={new Date(task?.expireAt ?? 0)}
+										value={expireAt}
 										onChange={(evt) =>
 											setExpireAt(new Date(evt.nativeEvent.timestamp))
 										}
@@ -106,7 +133,7 @@ export default function Edit() {
 								<View className="mb-10 gap-3 flex flex-row items-center">
 									<Text className="text-gray-900 text-md">Set Priority</Text>
 									<TaskPrioritySelector
-										selectedPriority={task?.priority as TaskPriority}
+										selectedPriority={taskPriority}
 										onSelectPriority={setTaskPriority}
 									/>
 								</View>
@@ -122,19 +149,26 @@ export default function Edit() {
 								</View>
 
 								<View className="flex flex-col gap-3">
-									{task?.childTasks?.map((value, index) => (
+									{childTasks?.map((value, index) => (
 										<View
 											key={value?._id}
 											className="flex-row gap-3 p-2 rounded-md bg-white items-center"
 										>
-											<Checkbox />
+											<Checkbox
+												isSelected={value?.completed}
+												onSelectedChange={(isSelected) =>
+													updateChildTask(index, { completed: isSelected })
+												}
+											/>
 											<TextInput
 												className="flex-1 p-0 placeholder:text-gray-600 text-lg h-auto "
 												placeholder={`Child Task #${index + 1}`}
 												placeholderTextColor="#9CA3AF"
 												value={value?.title}
 												multiline
-												onChangeText={(text) => updateChildTask(index, text)}
+												onChangeText={(text) =>
+													updateChildTask(index, { title: text })
+												}
 											/>
 											<TouchableOpacity
 												onPress={() => removeChildTask(index)}

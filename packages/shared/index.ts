@@ -29,9 +29,11 @@ export type TaskItem = {
 };
 
 export type ChildTask = {
-	_id: number;
-	title: string;
+	_id?: Id<"childTasks">;
+	_creationTime?: number;
 	completed: boolean;
+	title: string;
+	parentTaskId?: Id<"tasks">;
 };
 
 export type ReminderFrequency =
