@@ -86,6 +86,8 @@ export default function Edit() {
 		console.log("Updating task:", JSON.stringify(updatedTask, null, "\t"));
 	};
 
+	const handleDelete = async () => {};
+
 	const handleCancel = () => {
 		router.back();
 	};
@@ -187,11 +189,19 @@ export default function Edit() {
 							</View>
 						</View>
 					</ScrollView>
-					<View className="px-4">
+					<View className="px-4 flex flex-row justify-between mb-4 gap-5">
+						<Button
+							onPress={handleDelete}
+							size="lg"
+							variant="danger"
+							className="rounded-4xl flex-grow"
+						>
+							Delete Task
+						</Button>
 						<Button
 							onPress={handleEdit}
 							size="lg"
-							className="rounded-4xl bg-[#1c120d]"
+							className="rounded-4xl bg-[#1c120d] flex-grow"
 						>
 							Update Task
 						</Button>
