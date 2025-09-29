@@ -111,7 +111,6 @@ export const updateTask = mutation({
 		childTasks: v.optional(
 			v.array(
 				v.object({
-					_id: v.id("childTasks"),
 					title: v.string(),
 					completed: v.boolean(),
 				}),
@@ -127,12 +126,21 @@ export const updateTask = mutation({
 			priority: args.priority,
 		});
 
-		// update child tasks
+		// delete all previous child tasks
+		const previousChildTasks = await ctx.db
+			.query("childTasks")
+			.withIndex("parentTaskId", (q) => q.eq("parentTaskId", args.taskId))
+			.collect();
+
+		previousChildTasks.forEach(
+			async (previousChild) => await ctx.db.delete(previousChild._id),
+		);
+
 		args.childTasks?.forEach(async (childTask) => {
-			// if the child task has an _id, update it; otherwise, add new childTask
-			await ctx.db.patch(childTask._id as Id<"childTasks">, {
+			await ctx.db.insert("childTasks", {
 				title: childTask.title,
 				completed: childTask.completed,
+				parentTaskId: args.taskId,
 			});
 		});
 
