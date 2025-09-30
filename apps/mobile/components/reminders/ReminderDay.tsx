@@ -8,8 +8,8 @@ type ReminderDayProps = {
 const ReminderDay = ({ date }: ReminderDayProps) => {
   return (
     <View className="flex flex-row flex-grow justify-end">
-      <View className="flex flex-col items-center rounded-sm shadow-black bg-[#1c120d] p-2">
-        <Text className="textmd font-bold text-yellow-600">{days[date.getDay()]}</Text>
+      <View className="flex flex-col items-center rounded-sm shadow-black bg-yellow-600 p-2">
+        <Text className="text-md font-extrabold text-black">{days[date.getDay()]}</Text>
         <Text className="text-md text-white font-bold">{date.getDate()}</Text>
       </View>
     </View>

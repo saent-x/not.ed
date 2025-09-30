@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as http from "../http.js";
+import type * as reminders from "../reminders.js";
 import type * as shared from "../shared.js";
 import type * as stats from "../stats.js";
 import type * as tasks from "../tasks.js";
@@ -33,6 +34,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   http: typeof http;
+  reminders: typeof reminders;
   shared: typeof shared;
   stats: typeof stats;
   tasks: typeof tasks;

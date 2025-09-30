@@ -32,7 +32,7 @@ export const TaskItems = ({ tasks, onTaskStatusToggle, onTaskClick }: TaskItemsP
 								{item.description}
 							</Text>
 							<Text
-								className={`text-muted-foreground text-md ${item.completed ? "line-through text-muted-foreground" : ""}`}
+								className={`text-muted-foreground text-md ${item.completed ? "line-through" : ""}`}
 							>
 								{format(new Date(item.expireAt ?? 0), "MMM d, yyyy h:mm a")}
 							</Text>

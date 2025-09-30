@@ -61,17 +61,18 @@ export default function Index() {
 								setSelected(day.dateString);
 							}}
 							style={{
-								borderRadius: 12,
+								borderRadius: 10,
 							}}
 							theme={{
-								todayBackgroundColor: "#8a705c",
-								calendarBackground: "#f2ede8",
-								textSectionTitleColor: "#3b3b3b", // weekdays (Mon, Tue...)
-								monthTextColor: "#3b3b3b",
+								todayBackgroundColor: "black",
+								calendarBackground: "#8a705c",
+								textSectionTitleColor: "white", // weekdays (Mon, Tue...)
+								monthTextColor: "white",
 								todayTextColor: "white",
 								textDisabledColor: "#a8a29e",
-								arrowColor: "#3b3b3b",
+								arrowColor: "white",
 								dotColor: "#cc9469",
+								dayTextColor: "white"
 							}}
 							markingType="multi-dot"
 							markedDates={{
@@ -91,12 +92,7 @@ export default function Index() {
 				</View>
 				<Spacer />
 			</ScrollView>
-			<FAB
-				onPress={() => {
-					// Handle add task action
-					router.push("/reminders/create");
-				}}
-			/>
+			<FAB onPress={() => router.push("/reminders/create")} />
 		</>
 	);
 }
