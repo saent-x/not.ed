@@ -2,7 +2,7 @@ import { ReminderItem, TaskItem } from "@/lib/models";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Checkbox } from "heroui-native";
 import ReminderDay from "./ReminderDay";
-import { capitalize, formatDate } from "@/lib/util";
+import { formatDate } from "@/lib/util";
 
 type ReminderItemsProps = {
 	reminders: ReminderItem[];
@@ -23,25 +23,26 @@ export const ReminderItems = ({ reminders: tasks }: ReminderItemsProps) => {
 							onSelectedChange={() => {}}
 						/>
 
-						<View className="flex flex-col gap-1">
+						<View className="flex flex-col gap-1 flex-grow">
 							<Text
-								className={`text-lg truncate font-semibold ${item.completed ? "line-through" : ""}`}
+								className={`text-lg truncate font-semibold ${item.completed ? "line-through text-muted-foreground" : ""}`}
 							>
 								{item.title}
 							</Text>
 							<Text
 								className={`text-muted-foreground truncate text-md ${item.completed ? "line-through" : ""}`}
 							>
-								{`${formatDate(item.date)} | `}
+								{`${formatDate(item.date)} • `}
 								<Text>
 									{typeof item.frequency === "string" ? (
-										<Text className="font-bold text-yellow-600">
-											{capitalize(item.frequency)}
+										<Text
+											className={`font-bold uppercase ${item.completed ? "line-through text-muted-foreground" : "text-yellow-600"}`}
+										>
+											{item.frequency}
 										</Text>
 									) : (
 										""
-									)}{" "}
-									🔔
+									)}
 								</Text>
 							</Text>
 						</View>

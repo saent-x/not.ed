@@ -6,6 +6,7 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
+	Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router, useLocalSearchParams } from "expo-router";
@@ -26,6 +27,8 @@ export default function Edit() {
 	const task = useQuery(api.tasks.getTaskById, {
 		taskId: taskId as Id<"tasks">,
 	});
+	const updateTask = useMutation(api.tasks.updateTask);
+	const deleteTask = useMutation(api.tasks.deleteTask);
 
 	const [description, setDescription] = useState("");
 	type ChildTaskWithKey = ChildTask & { key?: number };
@@ -83,10 +86,59 @@ export default function Edit() {
 			priority: taskPriority,
 		};
 
+		try {
+			await updateTask({
+				taskId: updatedTask.taskId,
+				description: updatedTask.description,
+				expireAt: updatedTask.expireAt.getTime(),
+				priority: updatedTask.priority,
+				...(updatedTask.childTasks.length > 0
+					? {
+							childTasks: updatedTask.childTasks.map((child) => ({
+								title: child.title,
+								completed: child.completed,
+							})),
+						}
+					: {}),
+			});
+			toast.success("Task updated successfully!");
+			router.back();
+		} catch (error) {
+			toast.error("Failed to update task. Please try again.");
+			console.log("Error updating task:", error);
+		}
+
 		console.log("Updating task:", JSON.stringify(updatedTask, null, "\t"));
 	};
 
-	const handleDelete = async () => {};
+	const handleDelete = async () => {
+		try {
+			Alert.alert(
+				"Delete Child Task",
+				"Are you sure you want to delete this child task?",
+				[
+					{
+						text: "Cancel",
+						style: "cancel",
+					},
+					{
+						text: "Confirm",
+						onPress: async () => {
+							await deleteTask({
+								taskId: taskId as Id<"tasks">,
+							});
+							toast.success("Child task deleted successfully!");
+							router.back();
+						},
+						style: "default",
+					},
+				],
+			);
+		} catch (error) {
+			toast.error("Failed to delete child task. Please try again.");
+			console.log("Error deleting child task:", error);
+		}
+	};
 
 	const handleCancel = () => {
 		router.back();

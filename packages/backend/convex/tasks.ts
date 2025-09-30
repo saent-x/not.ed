@@ -3,7 +3,6 @@ import { mutation, query } from "./_generated/server";
 import { isSameDay } from "date-fns";
 import { filter } from "convex-helpers/server/filter";
 import type { TaskItem } from "@not.ed/shared";
-import { authComponent } from "./auth";
 import type { Id } from "./_generated/dataModel";
 import { AuthGuard } from "./util";
 
@@ -22,14 +21,11 @@ export const createTask = mutation({
 		),
 	},
 	handler: async (ctx, args) => {
-		const currentUser = await authComponent.getAuthUser(ctx);
-		if (!currentUser) {
-			return [];
-		}
+		const currentUser = await AuthGuard(ctx);
 
 		const taskId = await ctx.db.insert("tasks", {
 			description: args.description,
-			userId: currentUser.userId as Id<"users">,
+			userId: currentUser?.userId as Id<"users">,
 			completed: false,
 			priority: args.priority,
 			expireAt: args.expireAt,
@@ -111,7 +107,6 @@ export const updateTask = mutation({
 		childTasks: v.optional(
 			v.array(
 				v.object({
-					_id: v.id("childTasks"),
 					title: v.string(),
 					completed: v.boolean(),
 				}),
@@ -127,12 +122,21 @@ export const updateTask = mutation({
 			priority: args.priority,
 		});
 
-		// update child tasks
+		// delete all previous child tasks
+		const previousChildTasks = await ctx.db
+			.query("childTasks")
+			.withIndex("parentTaskId", (q) => q.eq("parentTaskId", args.taskId))
+			.collect();
+
+		previousChildTasks.forEach(
+			async (previousChild) => await ctx.db.delete(previousChild._id),
+		);
+
 		args.childTasks?.forEach(async (childTask) => {
-			// if the child task has an _id, update it; otherwise, add new childTask
-			await ctx.db.patch(childTask._id as Id<"childTasks">, {
+			await ctx.db.insert("childTasks", {
 				title: childTask.title,
 				completed: childTask.completed,
+				parentTaskId: args.taskId,
 			});
 		});
 
