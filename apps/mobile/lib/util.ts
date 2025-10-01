@@ -22,8 +22,22 @@ export function formatDate(date: Date): string {
 	return `${dayName} ${day} ${year} at ${hours}:${minutes}${ampm}`;
 }
 
-
 export const mapToKey = <T>(arr: T[]): (T & { key: number })[] => {
 	let counter = 0;
 	return arr.map((item) => ({ ...item, key: counter++ }));
 };
+
+export const frequencyOptions = [
+	{ label: "Daily", value: "daily" },
+	{ label: "Weekly", value: "weekly" },
+	{ label: "Monthly", value: "monthly" },
+	{ label: "Yearly", value: "yearly" },
+	{ label: "None", value: "none" },
+	{ label: "Every Monday", value: "every monday" },
+	{ label: "Every Tuesday", value: "every tuesday" },
+	{ label: "Every Wednesday", value: "every wednesday" },
+	{ label: "Every Thursday", value: "every thursday" },
+	{ label: "Every Friday", value: "every friday" },
+	{ label: "Every Saturday", value: "every saturday" },
+	{ label: "Every Sunday", value: "every sunday" },
+];

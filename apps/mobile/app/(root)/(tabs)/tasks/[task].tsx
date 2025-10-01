@@ -114,8 +114,8 @@ export default function Edit() {
 	const handleDelete = async () => {
 		try {
 			Alert.alert(
-				"Delete Child Task",
-				"Are you sure you want to delete this child task?",
+				"Delete Task",
+				"Are you sure you want to delete this task?",
 				[
 					{
 						text: "Cancel",
@@ -127,7 +127,7 @@ export default function Edit() {
 							await deleteTask({
 								taskId: taskId as Id<"tasks">,
 							});
-							toast.success("Child task deleted successfully!");
+							toast.success("Task deleted successfully!");
 							router.back();
 						},
 						style: "default",
@@ -135,8 +135,8 @@ export default function Edit() {
 				],
 			);
 		} catch (error) {
-			toast.error("Failed to delete child task. Please try again.");
-			console.log("Error deleting child task:", error);
+			toast.error("Failed to delete task. Please try again.");
+			console.log("Error deleting task:", error);
 		}
 	};
 
@@ -248,14 +248,14 @@ export default function Edit() {
 							variant="danger"
 							className="rounded-4xl flex-grow"
 						>
-							Delete Task
+							Delete
 						</Button>
 						<Button
 							onPress={handleEdit}
 							size="lg"
 							className="rounded-4xl bg-[#1c120d] flex-grow"
 						>
-							Update Task
+							Update
 						</Button>
 					</View>
 				</View>

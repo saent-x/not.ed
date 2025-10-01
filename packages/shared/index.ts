@@ -20,8 +20,8 @@ export type TaskPriority = "high" | "medium" | "low";
 export type TaskItem = {
 	_id: Id<"tasks">;
 	_creationTime: number;
-	userId?: Id<"users"> | undefined;
-	expireAt?: number | undefined;
+	userId: Id<"users">;
+	expireAt: number;
 	childTasks?: Id<"childTasks">[] | undefined;
 	description: string;
 	completed: boolean;
@@ -41,13 +41,21 @@ export type ReminderFrequency =
 	| "weekly"
 	| "monthly"
 	| "yearly"
-	| Date;
+	| "every monday"
+	| "every tuesday"
+	| "every wednesday"
+	| "every thursday"
+	| "every friday"
+	| "every saturday"
+	| "every sunday";
 
 export type ReminderItem = {
-	_id: number;
-	title: string;
-	date: number;
-	icon?: string;
-	frequency?: ReminderFrequency;
-	completed?: boolean;
+	_id: Id<"reminders">;
+    _creationTime: number;
+    userId: Id<"users">;
+    date: number;
+    completed: boolean;
+    title: string;
+    frequency: string;
+	earlyReminder: boolean;
 };

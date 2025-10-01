@@ -52,8 +52,6 @@ export default function Create() {
 			priority: taskPriority,
 		};
 
-		console.log("Saving task:", taskItem);
-
 		try {
 			await addNewTask({
 				description: taskItem.description,

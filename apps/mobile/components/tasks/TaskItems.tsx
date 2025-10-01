@@ -34,7 +34,7 @@ export const TaskItems = ({ tasks, onTaskStatusToggle, onTaskClick }: TaskItemsP
 							<Text
 								className={`text-muted-foreground text-md ${item.completed ? "line-through" : ""}`}
 							>
-								{format(new Date(item.expireAt ?? 0), "MMM d, yyyy h:mm a")}
+								{format(new Date(item.expireAt), "MMM d, yyyy h:mm a")}
 							</Text>
 						</View>
 						<TaskPriorityBadge

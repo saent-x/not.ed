@@ -6,47 +6,98 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
+	Alert,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
-import { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Button, Checkbox } from "heroui-native";
-import type { ReminderItem } from "@not.ed/shared";
-import { toast } from "sonner-native";
-import { useMutation } from "convex/react";
+import { Button, Checkbox, Chip } from "heroui-native";
+import { Ionicons } from "@expo/vector-icons";
+import { TaskPrioritySelector } from "@/components/tasks/TaskPrioritySelector";
+import type { ChildTask, TaskPriority } from "@not.ed/shared";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@not.ed/backend/convex/_generated/api";
+import { toast } from "sonner-native";
+import type { Id } from "@not.ed/backend/convex/_generated/dataModel";
 import { frequencyOptions } from "@/lib/util";
+import { Picker } from "@react-native-picker/picker";
 
-export default function Create() {
+export default function Edit() {
+	const reminderId = useLocalSearchParams().reminder as string;
+	const reminder = useQuery(api.reminders.getReminderById, {
+		reminderId: reminderId as Id<"reminders">,
+	});
+	const updateReminder = useMutation(api.reminders.updateReminder);
+	const deleteReminder = useMutation(api.reminders.deleteReminder);
+
 	const [title, setTitle] = useState("");
 	const [date, setDate] = useState<Date>(new Date());
 	const [frequency, setFrequency] = useState("none");
 	const [earlyReminder, setEarlyReminder] = useState(false);
-	
-	const addNewReminder = useMutation(api.reminders.createReminder);
 
-	const handleSave = async () => {
-		// TODO: Validate input
-		const reminderItem = {
+	useEffect(() => {
+		if (reminder) {
+			setTitle(reminder.title);
+			setDate(new Date(reminder.date ?? Date.now()));
+			setFrequency(reminder.frequency ?? "none");
+			setEarlyReminder(reminder.earlyReminder ?? false);
+		}
+	}, [reminder]);
+
+	const handleEdit = async () => {
+		const updatedReminder = {
+			reminderId: reminder?._id as Id<"reminders">,
 			title: title,
-			date: date.getTime(),
-			completed: false,
+			date: date,
 			frequency: frequency,
 			earlyReminder: earlyReminder,
-		} as ReminderItem;
+		};
 
-		await addNewReminder({
-			title: reminderItem.title,
-			date: reminderItem.date,
-			completed: reminderItem.completed,
-			frequency: reminderItem.frequency,
-			earlyReminder: reminderItem.earlyReminder,
-		});
+		try {
+			await updateReminder({
+				reminderId: updatedReminder.reminderId as Id<"reminders">,
+				title: updatedReminder.title,
+				date: updatedReminder.date.getTime(),
+				frequency: updatedReminder.frequency,
+				earlyReminder: updatedReminder.earlyReminder,
+			});
 
-		toast.success("Task created successfully!");
-		router.back();
+			toast.success("Reminder updated successfully!");
+			router.back();
+		} catch (error) {
+			toast.error("Failed to update reminder. Please try again.");
+			console.log("Error updating reminder:", error);
+		}
+	};
+
+	const handleDelete = async () => {
+		try {
+			Alert.alert(
+				"Delete Reminder",
+				"Are you sure you want to delete this reminder?",
+				[
+					{
+						text: "Cancel",
+						style: "cancel",
+					},
+					{
+						text: "Confirm",
+						onPress: async () => {
+							await deleteReminder({
+								reminderId: reminderId as Id<"reminders">,
+							});
+							toast.success("Reminder deleted successfully!");
+							router.back();
+						},
+						style: "default",
+					},
+				],
+			);
+		} catch (error) {
+			toast.error("Failed to delete child task. Please try again.");
+			console.log("Error deleting child task:", error);
+		}
 	};
 
 	const handleCancel = () => {
@@ -68,7 +119,7 @@ export default function Create() {
 								</Text>
 							</TouchableOpacity>
 							<Text className="text-lg font-bold text-gray-900">
-								New Reminder
+								Update Reminder
 							</Text>
 							<TouchableOpacity className="w-[20%]"></TouchableOpacity>
 						</View>
@@ -136,13 +187,21 @@ export default function Create() {
 							</View>
 						</View>
 					</ScrollView>
-					<View className="px-4">
+					<View className="px-4 flex flex-row justify-between mb-4 gap-5">
 						<Button
-							onPress={handleSave}
+							onPress={handleDelete}
 							size="lg"
-							className="rounded-4xl bg-[#1c120d]"
+							variant="danger"
+							className="rounded-4xl flex-grow"
 						>
-							Add Reminder
+							Delete
+						</Button>
+						<Button
+							onPress={handleEdit}
+							size="lg"
+							className="rounded-4xl bg-[#1c120d] flex-grow"
+						>
+							Update
 						</Button>
 					</View>
 				</View>
