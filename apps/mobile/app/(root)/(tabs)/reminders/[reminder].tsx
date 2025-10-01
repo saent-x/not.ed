@@ -6,25 +6,47 @@ import {
 	KeyboardAvoidingView,
 	Platform,
 	ScrollView,
+	Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
-import { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Button, Chip } from "heroui-native";
+import { Button, Checkbox, Chip } from "heroui-native";
 import { Ionicons } from "@expo/vector-icons";
 import { TaskPrioritySelector } from "@/components/tasks/TaskPrioritySelector";
 import type { ChildTask, TaskPriority } from "@not.ed/shared";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "@not.ed/backend/convex/_generated/api";
 import { toast } from "sonner-native";
+import type { Id } from "@not.ed/backend/convex/_generated/dataModel";
+import { mapToKey } from "@/lib/util";
 
-export default function Create() {
+export default function Edit() {
+	const taskId = useLocalSearchParams().task as string;
+	const task = useQuery(api.tasks.getTaskById, {
+		taskId: taskId as Id<"tasks">,
+	});
+	const updateTask = useMutation(api.tasks.updateTask);
+	const deleteTask = useMutation(api.tasks.deleteTask);
+
 	const [description, setDescription] = useState("");
-	const [childTasks, setChildTasks] = useState<ChildTask[]>([]);
+	type ChildTaskWithKey = ChildTask & { key?: number };
+	const [childTasks, setChildTasks] = useState<ChildTaskWithKey[]>([]);
 	const [expireAt, setExpireAt] = useState<Date>(new Date());
 	const [taskPriority, setTaskPriority] = useState<TaskPriority>("low");
-	const addNewTask = useMutation(api.tasks.createTask);
+
+	useEffect(() => {
+		if (task) {
+			setDescription(task.description);
+
+			const _childTasks = mapToKey<ChildTask>(task.childTasks ?? []); // this adds a unique key to each child task
+			setChildTasks(_childTasks as ChildTaskWithKey[]);
+
+			setExpireAt(new Date(task.expireAt ?? Date.now()));
+			setTaskPriority((task.priority as TaskPriority) ?? "low");
+		}
+	}, [task]);
 
 	const addChildTask = () => {
 		console.log("addding...");
@@ -34,18 +56,30 @@ export default function Create() {
 			{
 				title: "",
 				completed: false,
+				key: (prev[prev.length - 1]?.key ?? 0) + 1,
 			},
 		]);
 	};
-	const updateChildTask = (index: number, title: string) =>
+	const updateChildTask = (
+		index: number,
+		obj: { title?: string; completed?: boolean },
+	) =>
 		setChildTasks((prev) =>
-			prev.map((task, i) => (i === index ? { ...task, title } : task)),
+			prev.map((task, i) =>
+				i === index
+					? {
+							...task,
+							...obj,
+						}
+					: task,
+			),
 		);
 	const removeChildTask = (index: number) =>
 		setChildTasks((prev) => prev.filter((_, i) => i !== index));
 
-	const handleSave = async () => {
-		const taskItem = {
+	const handleEdit = async () => {
+		const updatedTask = {
+			taskId: taskId as Id<"tasks">,
 			description,
 			expireAt,
 			childTasks,
@@ -53,23 +87,56 @@ export default function Create() {
 		};
 
 		try {
-			await addNewTask({
-				description: taskItem.description,
-				expireAt: taskItem.expireAt ? taskItem.expireAt.getTime() : Date.now(),
-				priority: taskItem.priority,
-				childTasks: taskItem.childTasks.length
-					? taskItem.childTasks.map((child) => ({
-							title: child.title,
-							completed: child.completed,
-						}))
-					: undefined,
+			await updateTask({
+				taskId: updatedTask.taskId,
+				description: updatedTask.description,
+				expireAt: updatedTask.expireAt.getTime(),
+				priority: updatedTask.priority,
+				...(updatedTask.childTasks.length > 0
+					? {
+							childTasks: updatedTask.childTasks.map((child) => ({
+								title: child.title,
+								completed: child.completed,
+							})),
+						}
+					: {}),
 			});
-
-			toast.success("Task created successfully!");
+			toast.success("Task updated successfully!");
 			router.back();
 		} catch (error) {
-			toast.error("Failed to create task. Please try again.");
-			console.log("Error creating task:", error);
+			toast.error("Failed to update task. Please try again.");
+			console.log("Error updating task:", error);
+		}
+
+		console.log("Updating task:", JSON.stringify(updatedTask, null, "\t"));
+	};
+
+	const handleDelete = async () => {
+		try {
+			Alert.alert(
+				"Delete Child Task",
+				"Are you sure you want to delete this child task?",
+				[
+					{
+						text: "Cancel",
+						style: "cancel",
+					},
+					{
+						text: "Confirm",
+						onPress: async () => {
+							await deleteTask({
+								taskId: taskId as Id<"tasks">,
+							});
+							toast.success("Child task deleted successfully!");
+							router.back();
+						},
+						style: "default",
+					},
+				],
+			);
+		} catch (error) {
+			toast.error("Failed to delete child task. Please try again.");
+			console.log("Error deleting child task:", error);
 		}
 	};
 
@@ -141,14 +208,26 @@ export default function Create() {
 								</View>
 
 								<View className="flex flex-col gap-3">
-									{childTasks.map((value, index) => (
-										<View key={value._id} className="flex-row items-center">
+									{childTasks?.map((value, index) => (
+										<View
+											key={value?.key}
+											className="flex-row gap-3 p-2 rounded-md bg-white items-center"
+										>
+											<Checkbox
+												isSelected={value?.completed}
+												onSelectedChange={(isSelected) =>
+													updateChildTask(index, { completed: isSelected })
+												}
+											/>
 											<TextInput
-												className="flex-1 placeholder:text-gray-600 text-xl h-auto min-h-11"
+												className="flex-1 p-0 placeholder:text-gray-600 text-lg h-auto "
 												placeholder={`Child Task #${index + 1}`}
 												placeholderTextColor="#9CA3AF"
-												value={value.title}
-												onChangeText={(text) => updateChildTask(index, text)}
+												value={value?.title}
+												multiline
+												onChangeText={(text) =>
+													updateChildTask(index, { title: text })
+												}
 											/>
 											<TouchableOpacity
 												onPress={() => removeChildTask(index)}
@@ -162,13 +241,21 @@ export default function Create() {
 							</View>
 						</View>
 					</ScrollView>
-					<View className="px-4">
+					<View className="px-4 flex flex-row justify-between mb-4 gap-5">
 						<Button
-							onPress={handleSave}
+							onPress={handleDelete}
 							size="lg"
-							className="rounded-4xl bg-[#1c120d]"
+							variant="danger"
+							className="rounded-4xl flex-grow"
 						>
-							Add Task
+							Delete Task
+						</Button>
+						<Button
+							onPress={handleEdit}
+							size="lg"
+							className="rounded-4xl bg-[#1c120d] flex-grow"
+						>
+							Update Task
 						</Button>
 					</View>
 				</View>

@@ -12,17 +12,24 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import { useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Button, Checkbox, Chip } from "heroui-native";
+import { Button, Checkbox } from "heroui-native";
 import type { ReminderItem } from "@not.ed/shared";
+import { toast } from "sonner-native";
+import { useMutation } from "convex/react";
+import { api } from "@not.ed/backend/convex/_generated/api";
 
 export default function Create() {
 	const [description, setDescription] = useState("");
 	const [date, setDate] = useState<Date>(new Date());
 	const [frequency, setFrequency] = useState("none");
+	const [earlyReminder, setEarlyReminder] = useState(false);
+	const addNewReminder = useMutation(api.reminders.createReminder);
 
 	const frequencyOptions = [
 		{ label: "Daily", value: "daily" },
 		{ label: "Weekly", value: "weekly" },
+		{ label: "Monthly", value: "monthly" },
+		{ label: "Yearly", value: "yearly" },
 		{ label: "None", value: "none" },
 		{ label: "Every Monday", value: "every monday" },
 		{ label: "Every Tuesday", value: "every tuesday" },
@@ -33,15 +40,24 @@ export default function Create() {
 		{ label: "Every Sunday", value: "every sunday" },
 	];
 
-	const handleSave = () => {
+	const handleSave = async () => {
 		const reminderItem = {
-			_id: 1,
+			title: description,
 			date: date.getTime(),
 			completed: false,
 			frequency: frequency,
+			earlyReminder: earlyReminder,
 		} as ReminderItem;
 
-		console.log("Saving task:", reminderItem);
+		await addNewReminder({
+			title: reminderItem.title,
+			date: reminderItem.date,
+			completed: reminderItem.completed,
+			frequency: reminderItem.frequency,
+			earlyReminder: reminderItem.earlyReminder,
+		});
+
+		toast.success("Task created successfully!");
 		router.back();
 	};
 
@@ -96,7 +112,10 @@ export default function Create() {
 								</View>
 
 								<View className="mb-10 gap-3 flex flex-row items-center  ">
-									<Checkbox isSelected={true} onSelectedChange={() => {}} />
+									<Checkbox
+										isSelected={earlyReminder}
+										onSelectedChange={setEarlyReminder}
+									/>
 									<Text className="text-gray-900 text-md">
 										Set Early Reminders (optional)
 									</Text>

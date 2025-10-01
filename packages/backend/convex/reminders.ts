@@ -2,49 +2,51 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { isSameDay } from "date-fns";
 import { filter } from "convex-helpers/server/filter";
-import type { TaskItem } from "@not.ed/shared";
-import { authComponent } from "./auth";
+import type { ReminderItem } from "@not.ed/shared";
 import type { Id } from "./_generated/dataModel";
 import { AuthGuard } from "./util";
 
-export const createTask = mutation({
+export const createReminder = mutation({
 	args: {
-		description: v.string(),
-		expireAt: v.number(),
-		priority: v.string(),
-		childTasks: v.optional(
-			v.array(
-				v.object({
-					title: v.string(),
-					completed: v.boolean(),
-				}),
-			),
-		),
+		title: v.string(),
+		date: v.number(),
+		completed: v.boolean(),
+        frequency: v.string(),
+        earlyReminder: v.boolean()
 	},
 	handler: async (ctx, args) => {
-		const currentUser = await authComponent.getAuthUser(ctx);
-		if (!currentUser) {
-			return [];
-		}
+		const currentUser = await AuthGuard(ctx);
 
-		const taskId = await ctx.db.insert("tasks", {
-			description: args.description,
-			userId: currentUser.userId as Id<"users">,
-			completed: false,
-			priority: args.priority,
-			expireAt: args.expireAt,
+		const reminderId = await ctx.db.insert("reminders", {
+			userId: currentUser?.userId as Id<"users">,
+            title: args.title,
+            date: args.date,
+            completed: args.completed,
+            frequency: args.frequency,
+            earlyReminder: args.earlyReminder
 		});
 
-		if (args.childTasks) {
-			for (const childTask of args.childTasks) {
-				await ctx.db.insert("childTasks", {
-					title: childTask.title,
-					completed: childTask.completed,
-					parentTaskId: taskId,
-				});
-			}
-		}
+		return reminderId;
+	},
+});
 
-		return taskId;
+export const getRemindersByDate = query({
+	args: {
+		day: v.number(),
+	},
+	handler: async (ctx, args) => {
+		const currentUser = await AuthGuard(ctx);
+
+		const reminders = await filter(
+			ctx.db
+				.query("reminders")
+				.withIndex("userId", (q) =>
+					q.eq("userId", currentUser?.userId as Id<"users">),
+				),
+			(reminder) =>
+				isSameDay(new Date(reminder.date || Date.now()), new Date(args.day)),
+		).collect();
+
+		return reminders as ReminderItem[];
 	},
 });

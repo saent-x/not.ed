@@ -1,14 +1,16 @@
-import type { ReminderItem } from "@/lib/models";
 import { useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { Calendar } from "react-native-calendars";
 import { FAB } from "@/components/ui/FAB";
 import { Spacer } from "@/components/Spacer";
-import { ReminderItems } from "@/components/reminders/ReminderItems";
 import { router } from "expo-router";
+import { useQuery } from "convex/react";
+import { api } from "@not.ed/backend/convex/_generated/api";
+import { formatISO } from "date-fns";
+import { ReminderItems } from "@/components/reminders/ReminderItems";
 
 export default function Index() {
-	const [selected, setSelected] = useState("");
+	const [selectedDate, setSelectedDate] = useState<number>(Date.now());
 	const [refreshing, setRefreshing] = useState(false);
 
 	const onRefresh = () => {
@@ -19,29 +21,9 @@ export default function Index() {
 		}, 2000);
 	};
 
-	const todayReminders: ReminderItem[] = [
-		{
-			id: 1,
-			title: "Play Basketball",
-			date: new Date(),
-			frequency: "daily",
-			completed: false,
-		},
-		{
-			id: 2,
-			title: "Do the laundry",
-			date: new Date(),
-			frequency: "weekly",
-			completed: true,
-		},
-		{
-			id: 3,
-			title: "Do Project review",
-			date: new Date(),
-			frequency: "monthly",
-			completed: false,
-		},
-	];
+	const todayReminders = useQuery(api.reminders.getRemindersByDate, {
+		day: selectedDate,
+	});
 
 	return (
 		<>
@@ -58,25 +40,26 @@ export default function Index() {
 						<Text className="text-xl font-bold">{"Select Date"}</Text>
 						<Calendar
 							onDayPress={(day) => {
-								setSelected(day.dateString);
+								setSelectedDate(day.timestamp);
 							}}
 							style={{
-								borderRadius: 10,
+								borderRadius: 12,
 							}}
 							theme={{
-								todayBackgroundColor: "black",
-								calendarBackground: "#8a705c",
-								textSectionTitleColor: "white", // weekdays (Mon, Tue...)
-								monthTextColor: "white",
+								todayBackgroundColor: "#8a705c",
+								calendarBackground: "#f2ede8",
+								textSectionTitleColor: "#3b3b3b", // weekdays (Mon, Tue...)
+								monthTextColor: "#3b3b3b",
 								todayTextColor: "white",
 								textDisabledColor: "#a8a29e",
-								arrowColor: "white",
+								arrowColor: "#3b3b3b",
 								dotColor: "#cc9469",
-								dayTextColor: "white"
 							}}
 							markingType="multi-dot"
 							markedDates={{
-								[selected]: {
+								[formatISO(new Date(selectedDate), {
+									representation: "date",
+								})]: {
 									selected: true,
 									disableTouchEvent: true,
 									dotColor: "#cc9469",
@@ -87,12 +70,16 @@ export default function Index() {
 					</View>
 					<View>
 						<Text className="text-xl font-bold">{"Today"}</Text>
-						<ReminderItems reminders={todayReminders} />
+						{todayReminders && <ReminderItems reminders={todayReminders} />}
 					</View>
 				</View>
 				<Spacer />
 			</ScrollView>
-			<FAB onPress={() => router.push("/reminders/create")} />
+			<FAB
+				onPress={() => {
+					router.push("/reminders/create");
+				}}
+			/>
 		</>
 	);
 }
