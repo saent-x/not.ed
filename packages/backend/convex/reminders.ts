@@ -11,19 +11,19 @@ export const createReminder = mutation({
 		title: v.string(),
 		date: v.number(),
 		completed: v.boolean(),
-        frequency: v.string(),
-        earlyReminder: v.boolean()
+		frequency: v.string(),
+		earlyReminder: v.boolean(),
 	},
 	handler: async (ctx, args) => {
 		const currentUser = await AuthGuard(ctx);
 
 		const reminderId = await ctx.db.insert("reminders", {
 			userId: currentUser?.userId as Id<"users">,
-            title: args.title,
-            date: args.date,
-            completed: args.completed,
-            frequency: args.frequency,
-            earlyReminder: args.earlyReminder
+			title: args.title,
+			date: args.date,
+			completed: args.completed,
+			frequency: args.frequency,
+			earlyReminder: args.earlyReminder,
 		});
 
 		return reminderId;
@@ -48,5 +48,65 @@ export const getRemindersByDate = query({
 		).collect();
 
 		return reminders as ReminderItem[];
+	},
+});
+
+export const toggleReminderCompletion = mutation({
+	args: {
+		reminderId: v.id("reminders"),
+		completed: v.boolean(),
+	},
+	handler: async (ctx, args) => {
+		await AuthGuard(ctx);
+		await ctx.db.patch(args.reminderId, { completed: args.completed });
+	},
+});
+
+export const getReminderById = query({
+	args: {
+		reminderId: v.id("reminders"),
+	},
+	handler: async (ctx, args) => {
+		await AuthGuard(ctx);
+
+		const reminder = await ctx.db.get(args.reminderId);
+		if (!reminder) {
+			return null;
+		}
+
+		return reminder;
+	},
+});
+
+export const updateReminder = mutation({
+	args: {
+		reminderId: v.id("reminders"),
+		title: v.string(),
+		date: v.number(),
+		frequency: v.string(),
+		earlyReminder: v.boolean(),
+	},
+	handler: async (ctx, args) => {
+		await AuthGuard(ctx);
+
+		await ctx.db.patch(args.reminderId, {
+			title: args.title,
+			date: args.date,
+			frequency: args.frequency,
+			earlyReminder: args.earlyReminder,
+		});
+
+		return;
+	},
+});
+
+export const deleteReminder = mutation({
+	args: {
+		reminderId: v.id("reminders"),
+	},
+	handler: async (ctx, args) => {
+		await AuthGuard(ctx);
+
+		await ctx.db.delete(args.reminderId);
 	},
 });

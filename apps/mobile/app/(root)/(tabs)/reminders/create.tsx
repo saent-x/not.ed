@@ -17,32 +17,20 @@ import type { ReminderItem } from "@not.ed/shared";
 import { toast } from "sonner-native";
 import { useMutation } from "convex/react";
 import { api } from "@not.ed/backend/convex/_generated/api";
+import { frequencyOptions } from "@/lib/util";
 
 export default function Create() {
-	const [description, setDescription] = useState("");
+	const [title, setTitle] = useState("");
 	const [date, setDate] = useState<Date>(new Date());
 	const [frequency, setFrequency] = useState("none");
 	const [earlyReminder, setEarlyReminder] = useState(false);
+	
 	const addNewReminder = useMutation(api.reminders.createReminder);
 
-	const frequencyOptions = [
-		{ label: "Daily", value: "daily" },
-		{ label: "Weekly", value: "weekly" },
-		{ label: "Monthly", value: "monthly" },
-		{ label: "Yearly", value: "yearly" },
-		{ label: "None", value: "none" },
-		{ label: "Every Monday", value: "every monday" },
-		{ label: "Every Tuesday", value: "every tuesday" },
-		{ label: "Every Wednesday", value: "every wednesday" },
-		{ label: "Every Thursday", value: "every thursday" },
-		{ label: "Every Friday", value: "every friday" },
-		{ label: "Every Saturday", value: "every saturday" },
-		{ label: "Every Sunday", value: "every sunday" },
-	];
-
 	const handleSave = async () => {
+		// TODO: Validate input
 		const reminderItem = {
-			title: description,
+			title: title,
 			date: date.getTime(),
 			completed: false,
 			frequency: frequency,
@@ -93,8 +81,8 @@ export default function Create() {
 										className="rounded-sm py-3  placeholder:text-gray-600 text-3xl h-auto"
 										placeholder="Remind me..."
 										placeholderTextColor="#9CA3AF"
-										value={description}
-										onChangeText={setDescription}
+										value={title}
+										onChangeText={setTitle}
 										multiline
 										textAlignVertical="top"
 									/>

@@ -20,102 +20,62 @@ import { useMutation, useQuery } from "convex/react";
 import { api } from "@not.ed/backend/convex/_generated/api";
 import { toast } from "sonner-native";
 import type { Id } from "@not.ed/backend/convex/_generated/dataModel";
-import { mapToKey } from "@/lib/util";
+import { frequencyOptions } from "@/lib/util";
+import { Picker } from "@react-native-picker/picker";
 
 export default function Edit() {
-	const taskId = useLocalSearchParams().task as string;
-	const task = useQuery(api.tasks.getTaskById, {
-		taskId: taskId as Id<"tasks">,
+	const reminderId = useLocalSearchParams().reminder as string;
+	const reminder = useQuery(api.reminders.getReminderById, {
+		reminderId: reminderId as Id<"reminders">,
 	});
-	const updateTask = useMutation(api.tasks.updateTask);
-	const deleteTask = useMutation(api.tasks.deleteTask);
+	const updateReminder = useMutation(api.reminders.updateReminder);
+	const deleteReminder = useMutation(api.reminders.deleteReminder);
 
-	const [description, setDescription] = useState("");
-	type ChildTaskWithKey = ChildTask & { key?: number };
-	const [childTasks, setChildTasks] = useState<ChildTaskWithKey[]>([]);
-	const [expireAt, setExpireAt] = useState<Date>(new Date());
-	const [taskPriority, setTaskPriority] = useState<TaskPriority>("low");
+	const [title, setTitle] = useState("");
+	const [date, setDate] = useState<Date>(new Date());
+	const [frequency, setFrequency] = useState("none");
+	const [earlyReminder, setEarlyReminder] = useState(false);
 
 	useEffect(() => {
-		if (task) {
-			setDescription(task.description);
-
-			const _childTasks = mapToKey<ChildTask>(task.childTasks ?? []); // this adds a unique key to each child task
-			setChildTasks(_childTasks as ChildTaskWithKey[]);
-
-			setExpireAt(new Date(task.expireAt ?? Date.now()));
-			setTaskPriority((task.priority as TaskPriority) ?? "low");
+		if (reminder) {
+			setTitle(reminder.title);
+			setDate(new Date(reminder.date ?? Date.now()));
+			setFrequency(reminder.frequency ?? "none");
+			setEarlyReminder(reminder.earlyReminder ?? false);
 		}
-	}, [task]);
-
-	const addChildTask = () => {
-		console.log("addding...");
-
-		setChildTasks((prev) => [
-			...prev,
-			{
-				title: "",
-				completed: false,
-				key: (prev[prev.length - 1]?.key ?? 0) + 1,
-			},
-		]);
-	};
-	const updateChildTask = (
-		index: number,
-		obj: { title?: string; completed?: boolean },
-	) =>
-		setChildTasks((prev) =>
-			prev.map((task, i) =>
-				i === index
-					? {
-							...task,
-							...obj,
-						}
-					: task,
-			),
-		);
-	const removeChildTask = (index: number) =>
-		setChildTasks((prev) => prev.filter((_, i) => i !== index));
+	}, [reminder]);
 
 	const handleEdit = async () => {
-		const updatedTask = {
-			taskId: taskId as Id<"tasks">,
-			description,
-			expireAt,
-			childTasks,
-			priority: taskPriority,
+		const updatedReminder = {
+			reminderId: reminder?._id as Id<"reminders">,
+			title: title,
+			date: date,
+			frequency: frequency,
+			earlyReminder: earlyReminder,
 		};
 
 		try {
-			await updateTask({
-				taskId: updatedTask.taskId,
-				description: updatedTask.description,
-				expireAt: updatedTask.expireAt.getTime(),
-				priority: updatedTask.priority,
-				...(updatedTask.childTasks.length > 0
-					? {
-							childTasks: updatedTask.childTasks.map((child) => ({
-								title: child.title,
-								completed: child.completed,
-							})),
-						}
-					: {}),
+			await updateReminder({
+				reminderId: updatedReminder.reminderId as Id<"reminders">,
+				title: updatedReminder.title,
+				date: updatedReminder.date.getTime(),
+				frequency: updatedReminder.frequency,
+				earlyReminder: updatedReminder.earlyReminder,
 			});
-			toast.success("Task updated successfully!");
+
+			toast.success("Reminder updated successfully!");
 			router.back();
 		} catch (error) {
-			toast.error("Failed to update task. Please try again.");
-			console.log("Error updating task:", error);
+			toast.error("Failed to update reminder. Please try again.");
+			console.log("Error updating reminder:", error);
 		}
-
-		console.log("Updating task:", JSON.stringify(updatedTask, null, "\t"));
 	};
 
 	const handleDelete = async () => {
 		try {
 			Alert.alert(
-				"Delete Child Task",
-				"Are you sure you want to delete this child task?",
+				"Delete Reminder",
+				"Are you sure you want to delete this reminder?",
 				[
 					{
 						text: "Cancel",
@@ -124,10 +84,10 @@ export default function Edit() {
 					{
 						text: "Confirm",
 						onPress: async () => {
-							await deleteTask({
-								taskId: taskId as Id<"tasks">,
+							await deleteReminder({
+								reminderId: reminderId as Id<"reminders">,
 							});
-							toast.success("Child task deleted successfully!");
+							toast.success("Reminder deleted successfully!");
 							router.back();
 						},
 						style: "default",
@@ -158,7 +118,9 @@ export default function Edit() {
 									Cancel
 								</Text>
 							</TouchableOpacity>
-							<Text className="text-lg font-bold text-gray-900">New Task</Text>
+							<Text className="text-lg font-bold text-gray-900">
+								Update Reminder
+							</Text>
 							<TouchableOpacity className="w-[20%]"></TouchableOpacity>
 						</View>
 
@@ -168,75 +130,59 @@ export default function Edit() {
 								<View className="mb-6">
 									<TextInput
 										className="rounded-sm py-3  placeholder:text-gray-600 text-3xl h-auto"
-										placeholder="Task Description"
+										placeholder="Remind me..."
 										placeholderTextColor="#9CA3AF"
-										value={description}
-										onChangeText={setDescription}
+										value={title}
+										onChangeText={setTitle}
 										multiline
 										textAlignVertical="top"
 									/>
 								</View>
 								<View className="mb-6 flex flex-row items-center">
-									<Text className="text-gray-900 text-md">Expire&apos;s</Text>
+									<Text className="text-gray-900 text-md">Date</Text>
 									<DateTimePicker
 										mode="datetime"
-										value={expireAt}
+										value={date}
 										onChange={(evt) =>
-											setExpireAt(new Date(evt.nativeEvent.timestamp))
+											setDate(new Date(evt.nativeEvent.timestamp))
 										}
 										style={{ marginLeft: 0 }}
 									/>
 								</View>
 
-								{/*------ Task Priority Section ------*/}
-								<View className="mb-10 gap-3 flex flex-row items-center">
-									<Text className="text-gray-900 text-md">Set Priority</Text>
-									<TaskPrioritySelector
-										selectedPriority={taskPriority}
-										onSelectPriority={setTaskPriority}
+								<View className="mb-10 gap-3 flex flex-row items-center  ">
+									<Checkbox
+										isSelected={earlyReminder}
+										onSelectedChange={setEarlyReminder}
 									/>
+									<Text className="text-gray-900 text-md">
+										Set Early Reminders (optional)
+									</Text>
 								</View>
 
-								{/*------ Add Child Task Section ------*/}
-								<View className="mb-6">
-									<Chip variant="secondary" onPress={addChildTask}>
-										<Chip.StartContent className="pr-1">
-											<Ionicons name="add" size={12} color="#F59E0B" />
-										</Chip.StartContent>
-										<Chip.LabelContent>{"Add child task"}</Chip.LabelContent>
-									</Chip>
-								</View>
-
-								<View className="flex flex-col gap-3">
-									{childTasks?.map((value, index) => (
-										<View
-											key={value?.key}
-											className="flex-row gap-3 p-2 rounded-md bg-white items-center"
-										>
-											<Checkbox
-												isSelected={value?.completed}
-												onSelectedChange={(isSelected) =>
-													updateChildTask(index, { completed: isSelected })
-												}
+								{/*------ Frequency Section ------*/}
+								<View className="mb-10 gap-3 flex flex-row items-center  ">
+									<Text className="text-gray-900 text-md">Set Frequency</Text>
+									<Picker
+										selectedValue={frequency}
+										onValueChange={setFrequency}
+										mode="dialog"
+										numberOfLines={1}
+										prompt="Select Frequency"
+										style={{
+											width: 250,
+											marginLeft: 10,
+											alignSelf: "flex-start",
+										}}
+									>
+										{frequencyOptions.map((option) => (
+											<Picker.Item
+												key={option.value}
+												label={option.label}
+												value={option.value}
 											/>
-											<TextInput
-												className="flex-1 p-0 placeholder:text-gray-600 text-lg h-auto "
-												placeholder={`Child Task #${index + 1}`}
-												placeholderTextColor="#9CA3AF"
-												value={value?.title}
-												multiline
-												onChangeText={(text) =>
-													updateChildTask(index, { title: text })
-												}
-											/>
-											<TouchableOpacity
-												onPress={() => removeChildTask(index)}
-												className="ml-2 px-3 py-2 rounded-sm bg-secondary"
-											>
-												<Ionicons name="remove" size={18} color="red" />
-											</TouchableOpacity>
-										</View>
-									))}
+										))}
+									</Picker>
 								</View>
 							</View>
 						</View>
@@ -248,14 +194,14 @@ export default function Edit() {
 							variant="danger"
 							className="rounded-4xl flex-grow"
 						>
-							Delete Task
+							Delete
 						</Button>
 						<Button
 							onPress={handleEdit}
 							size="lg"
 							className="rounded-4xl bg-[#1c120d] flex-grow"
 						>
-							Update Task
+							Update
 						</Button>
 					</View>
 				</View>

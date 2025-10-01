@@ -110,7 +110,6 @@ export default function Index() {
 			</ScrollView>
 			<FAB
 				onPress={() => {
-					// Handle add task action
 					router.push("/tasks/create");
 				}}
 			/>

@@ -6,9 +6,13 @@ import { format } from "date-fns";
 
 type ReminderItemsProps = {
 	reminders: ReminderItem[];
+	onReminderClick: (reminderId: string) => void;
 };
 
-export const ReminderItems = ({ reminders: tasks }: ReminderItemsProps) => {
+export const ReminderItems = ({
+	reminders: tasks,
+	onReminderClick,
+}: ReminderItemsProps) => {
 	return (
 		<View className="pt-5 flex gap-8">
 			{tasks.map((item) => (
@@ -16,6 +20,7 @@ export const ReminderItems = ({ reminders: tasks }: ReminderItemsProps) => {
 					<TouchableOpacity
 						key={item._id}
 						className="flex flex-row items-center gap-4"
+						onPress={() => onReminderClick(item._id)}
 					>
 						<Checkbox
 							isSelected={item.completed}

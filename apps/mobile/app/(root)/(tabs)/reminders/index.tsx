@@ -70,7 +70,14 @@ export default function Index() {
 					</View>
 					<View>
 						<Text className="text-xl font-bold">{"Today"}</Text>
-						{todayReminders && <ReminderItems reminders={todayReminders} />}
+						{todayReminders && (
+							<ReminderItems
+								onReminderClick={(reminderId) =>
+									router.push(`/reminders/${reminderId}`)
+								}
+								reminders={todayReminders}
+							/>
+						)}
 					</View>
 				</View>
 				<Spacer />
