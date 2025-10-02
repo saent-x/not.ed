@@ -16,6 +16,7 @@
     "@convex-dev/better-auth": "^0.8.0",
     "convex": "^1.27.0",
     "convex-helpers": "^0.1.104",
-    "date-fns": "^4.1.0"
+    "date-fns": "^4.1.0",
+    "react-native-webview": "13.15.0"
   }
 }

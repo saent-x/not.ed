@@ -18,13 +18,15 @@
 			"recommended": true,
 			"a11y": {
 				"useValidAriaRole": {
-				"options": {
-					"allowInvalidRoles": [
-					"Editor"
-					]
+					"level": "error",
+					"options": {
+						"allowInvalidRoles": ["Editor"]
+					}
 				}
-				}
-      		}
+			},
+			"correctness": {
+				"noEmptyPattern": "off"
+			}
 		}
 	},
 	"javascript": {

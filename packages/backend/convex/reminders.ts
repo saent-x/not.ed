@@ -44,7 +44,7 @@ export const getRemindersByDate = query({
 					q.eq("userId", currentUser?.userId as Id<"users">),
 				),
 			(reminder) =>
-				isSameDay(new Date(reminder.date || Date.now()), new Date(args.day)),
+				isSameDay(new Date(reminder.date), new Date(args.day)),
 		).collect();
 
 		return reminders as ReminderItem[];

@@ -14,6 +14,7 @@ import { useState } from "react";
 import { Button } from "heroui-native";
 import { TagSelector } from "@/components/journals/TagSelector";
 import type { JournalItem } from "@not.ed/shared";
+import RichTextEditor from "@/components/journals/RichTextEditor";
 
 export default function Create() {
 	const [content, setContent] = useState("");
@@ -88,7 +89,8 @@ export default function Create() {
 								/>
 
 								<View className="mb-10 gap-3 flex flex-row items-center">
-									<TextInput
+									<RichTextEditor dom={{ matchContents: true }} />
+									{/* <TextInput
 										className="rounded-sm py-3  placeholder:text-gray-600 text-2xl h-auto"
 										placeholder="Content..."
 										placeholderTextColor="#9CA3AF"
@@ -96,7 +98,7 @@ export default function Create() {
 										onChangeText={setContent}
 										multiline
 										textAlignVertical="top"
-									/>
+									/> */}
 								</View>
 							</View>
 						</View>
