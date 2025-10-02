@@ -59,7 +59,7 @@ export const getTasksByDate = query({
 					q.eq("userId", currentUser?.userId as Id<"users">),
 				),
 			(task) =>
-				isSameDay(new Date(task.expireAt || Date.now()), new Date(args.day)),
+				isSameDay(new Date(task.expireAt), new Date(args.day)),
 		).collect();
 
 		return tasks as TaskItem[];

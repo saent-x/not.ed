@@ -24,7 +24,7 @@ export default function Create() {
 	const [date, setDate] = useState<Date>(new Date());
 	const [frequency, setFrequency] = useState("none");
 	const [earlyReminder, setEarlyReminder] = useState(false);
-	
+
 	const addNewReminder = useMutation(api.reminders.createReminder);
 
 	const handleSave = async () => {
@@ -45,7 +45,7 @@ export default function Create() {
 			earlyReminder: reminderItem.earlyReminder,
 		});
 
-		toast.success("Task created successfully!");
+		toast.success("Reminder created successfully!");
 		router.back();
 	};
 

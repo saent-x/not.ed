@@ -95,8 +95,8 @@ export default function Edit() {
 				],
 			);
 		} catch (error) {
-			toast.error("Failed to delete child task. Please try again.");
-			console.log("Error deleting child task:", error);
+			toast.error("Failed to delete reminder. Please try again.");
+			console.log("Error deleting reminder:", error);
 		}
 	};
 
