@@ -12,7 +12,7 @@ import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 
 // Typesafe way to pass Convex functions defined in this file
-const authFunctions: AuthFunctions | undefined = internal.auth;
+// const authFunctions: AuthFunctions | undefined = internal.auth;
 
 export const setUserId = mutation({
   args: {
@@ -28,7 +28,7 @@ export const setUserId = mutation({
 
 // Initialize the component
 export const authComponent = createClient<DataModel>(components.betterAuth, {
-  authFunctions,
+  // authFunctions,
   verbose: true,
   triggers: {
     user: {
@@ -51,7 +51,10 @@ export const authComponent = createClient<DataModel>(components.betterAuth, {
 
 // export const { onCreate, onUpdate, onDelete } = authComponent.triggersApi();
 
-export const createAuth = (ctx: GenericCtx<DataModel>) =>
+export const createAuth = (
+  ctx: GenericCtx<DataModel>,
+  { optionsOnly } = { optionsOnly: false },
+) =>
   // Configure your Better Auth instance here
   betterAuth({
     trustedOrigins: [
