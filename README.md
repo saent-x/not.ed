@@ -1,1 +1,0 @@
-# NOT.ED AI Task, Reminder and Journaling App
